@@ -167,11 +167,14 @@ export function SubscriptionChoice({ onSubscriptionSelected, currentUserId }: Su
                 <Button 
                   onClick={() => handleSelectPlan(planId)}
                   disabled={isLoading && selectedPlan === planId}
-                  className={`w-full h-14 text-lg font-bold rounded-2xl transition-all duration-300 ${
-                    planId === 'pro' 
-                      ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black shadow-lg hover:shadow-xl' 
-                      : 'bg-gradient-to-r from-red-800 to-red-900 hover:from-red-900 hover:to-red-950 text-white shadow-lg hover:shadow-xl'
+                  className={`w-full h-14 text-lg font-bold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl ${
+                    planId === 'pro'
+                      ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black'
+                      : 'text-white'
                   }`}
+                  style={planId !== 'pro' ? {
+                    background: 'linear-gradient(135deg, #722f37 0%, #8b3a62 100%)',
+                  } : {}}
                 >
                   {isLoading && selectedPlan === planId ? (
                     "Processing..."
