@@ -97,7 +97,9 @@ export function SubscriptionChoice({ onSubscriptionSelected, currentUserId }: Su
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-950 flex items-center justify-center p-8">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-purple-950 flex items-center justify-center p-8" style={{
+      background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 40%, #4a1a2a 100%)'
+    }}>
       <div className="max-w-7xl w-full">
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-white mb-6">
