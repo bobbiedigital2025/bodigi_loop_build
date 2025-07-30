@@ -11,6 +11,7 @@ export default function ModuleNavigation({ activeTab, onTabChange }: ModuleNavig
     { id: "mvp", label: "MVP Builder", icon: Rocket },
     { id: "marketing", label: "Marketing Builder", icon: Megaphone },
     { id: "quiz", label: "Learn & Earn Loop", icon: Trophy },
+    { id: "ai-agent", label: "AI Agent Builder", icon: Bot },
     { id: "contacts", label: "Contact Hub", icon: Users },
     { id: "usage", label: "Usage & Billing", icon: Crown },
     { id: "admin", label: "Admin Dashboard", icon: TrendingUp },
