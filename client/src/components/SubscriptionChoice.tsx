@@ -129,7 +129,9 @@ export function SubscriptionChoice({ onSubscriptionSelected, currentUserId }: Su
                 </Badge>
               )}
               
-              <CardHeader className="text-center bg-gradient-to-r from-red-900 to-red-800 text-white pt-8 pb-6 rounded-t-3xl">
+              <CardHeader className="text-center text-white pt-8 pb-6 rounded-t-3xl" style={{
+                background: 'linear-gradient(135deg, #722f37 0%, #8b3a62 100%)'
+              }}>
                 <div className="flex justify-center mb-4">
                   {getPlanIcon(planId)}
                 </div>
