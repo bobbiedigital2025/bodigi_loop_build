@@ -56,7 +56,7 @@ export default function Dashboard() {
       case "marketing":
         return <MarketingBuilder />;
       case "quiz":
-        return <LearnEarnLoop />;
+        return <LearnEarnLoopBuilder />;
       case "contacts":
         return <ContactHub />;
       case "admin":
