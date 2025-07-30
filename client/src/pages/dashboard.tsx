@@ -59,7 +59,7 @@ export default function Dashboard() {
       case "quiz":
         return <LearnEarnLoopBuilder />;
       case "ai-agent":
-        return <AIAgentBuilder />;
+        return <BoltzAgent />;
       case "contacts":
         return <ContactHub />;
       case "admin":
