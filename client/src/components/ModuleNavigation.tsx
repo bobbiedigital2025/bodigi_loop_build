@@ -1,4 +1,4 @@
-import { Palette, Rocket, Megaphone, Trophy, Users, TrendingUp, Crown } from "lucide-react";
+import { Palette, Rocket, Megaphone, Trophy, Users, TrendingUp, Crown, Bot } from "lucide-react";
 
 interface ModuleNavigationProps {
   activeTab: string;
