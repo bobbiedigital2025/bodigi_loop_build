@@ -6,12 +6,14 @@
       "duration": 7,
       "features": {
         "builds_per_month": 4,
+        "bonus_features_per_build": 0,
         "learn_earn_access": true,
-        "bonus_prize_unlocks": 2,
+        "all_builders_access": true,
+        "contact_hub_access": false,
+        "marketing_builder_access": false,
         "priority_support": false,
-        "unlimited_builds": false,
-        "advanced_ai_features": false,
-        "dedicated_support": false
+        "white_label_access": false,
+        "dedicated_specialist": false
       },
       "stripe_price_id": "price_trial",
       "requires_card": true,
@@ -24,12 +26,14 @@
       "billing_cycle": "monthly",
       "features": {
         "builds_per_month": 4,
+        "bonus_features_per_build": 2,
         "learn_earn_access": true,
-        "bonus_prize_unlocks": 2,
+        "all_builders_access": true,
+        "contact_hub_access": true,
+        "marketing_builder_access": false,
         "priority_support": false,
-        "unlimited_builds": false,
-        "advanced_ai_features": false,
-        "dedicated_support": false
+        "white_label_access": false,
+        "dedicated_specialist": false
       },
       "stripe_price_id": "price_1QdnDbGi4XVuRGXCsJZ8NrHi"
     },
@@ -39,12 +43,14 @@
       "billing_cycle": "monthly",
       "features": {
         "builds_per_month": 20,
+        "bonus_features_per_build": 5,
         "learn_earn_access": true,
-        "bonus_prize_unlocks": 5,
+        "all_builders_access": true,
+        "contact_hub_access": true,
+        "marketing_builder_access": true,
         "priority_support": true,
-        "unlimited_builds": false,
-        "advanced_ai_features": true,
-        "dedicated_support": false
+        "white_label_access": false,
+        "dedicated_specialist": false
       },
       "stripe_price_id": "price_1QdnDbGi4XVuRGXCsJZ8NrHj"
     },
@@ -54,12 +60,14 @@
       "billing_cycle": "monthly",
       "features": {
         "builds_per_month": -1,
+        "bonus_features_per_build": 10,
         "learn_earn_access": true,
-        "bonus_prize_unlocks": 10,
+        "all_builders_access": true,
+        "contact_hub_access": true,
+        "marketing_builder_access": true,
         "priority_support": true,
-        "unlimited_builds": true,
-        "advanced_ai_features": true,
-        "dedicated_support": true
+        "white_label_access": true,
+        "dedicated_specialist": true
       },
       "stripe_price_id": "price_1QdnDbGi4XVuRGXCsJZ8NrHk"
     }
