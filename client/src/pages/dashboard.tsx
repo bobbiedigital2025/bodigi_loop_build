@@ -6,7 +6,7 @@ import BrandingBuilder from "@/components/BrandingBuilder";
 import MVPBuilder from "@/components/MVPBuilder";
 import MarketingBuilder from "@/components/MarketingBuilder";
 import LearnEarnLoopBuilder from "@/components/LearnEarnLoopBuilder";
-import AIAgentBuilder from "@/components/AIAgentBuilder";
+import BoltzAgent from "@/components/BoltzAgent";
 import ContactHub from "@/components/ContactHub";
 import AdminDashboard from "@/components/AdminDashboard";
 import { SubscriptionChoice } from "@/components/SubscriptionChoice";
