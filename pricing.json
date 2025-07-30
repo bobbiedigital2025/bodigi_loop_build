@@ -1,0 +1,73 @@
+{
+  "plans": {
+    "trial": {
+      "name": "Free Trial",
+      "price": 0,
+      "duration": 7,
+      "features": {
+        "builds_per_month": 4,
+        "learn_earn_access": true,
+        "bonus_prize_unlocks": 2,
+        "priority_support": false,
+        "unlimited_builds": false,
+        "advanced_ai_features": false,
+        "dedicated_support": false
+      },
+      "stripe_price_id": "price_trial",
+      "requires_card": true,
+      "auto_upgrade_to": "basic",
+      "auto_upgrade_price": 9.99
+    },
+    "basic": {
+      "name": "Basic Plan",
+      "price": 9.99,
+      "billing_cycle": "monthly",
+      "features": {
+        "builds_per_month": 4,
+        "learn_earn_access": true,
+        "bonus_prize_unlocks": 2,
+        "priority_support": false,
+        "unlimited_builds": false,
+        "advanced_ai_features": false,
+        "dedicated_support": false
+      },
+      "stripe_price_id": "price_1QdnDbGi4XVuRGXCsJZ8NrHi"
+    },
+    "pro": {
+      "name": "Pro Plan",
+      "price": 29.99,
+      "billing_cycle": "monthly",
+      "features": {
+        "builds_per_month": 20,
+        "learn_earn_access": true,
+        "bonus_prize_unlocks": 5,
+        "priority_support": true,
+        "unlimited_builds": false,
+        "advanced_ai_features": true,
+        "dedicated_support": false
+      },
+      "stripe_price_id": "price_1QdnDbGi4XVuRGXCsJZ8NrHj"
+    },
+    "enterprise": {
+      "name": "Enterprise Plan",
+      "price": 99.99,
+      "billing_cycle": "monthly",
+      "features": {
+        "builds_per_month": -1,
+        "learn_earn_access": true,
+        "bonus_prize_unlocks": 10,
+        "priority_support": true,
+        "unlimited_builds": true,
+        "advanced_ai_features": true,
+        "dedicated_support": true
+      },
+      "stripe_price_id": "price_1QdnDbGi4XVuRGXCsJZ8NrHk"
+    }
+  },
+  "build_types": [
+    "mvp",
+    "branding", 
+    "marketing"
+  ],
+  "usage_reset_day": 1
+}
