@@ -5,7 +5,7 @@ import ModuleNavigation from "@/components/ModuleNavigation";
 import BrandingBuilder from "@/components/BrandingBuilder";
 import MVPBuilder from "@/components/MVPBuilder";
 import MarketingBuilder from "@/components/MarketingBuilder";
-import LearnEarnLoop from "@/components/LearnEarnLoop";
+import LearnEarnLoopBuilder from "@/components/LearnEarnLoopBuilder";
 import ContactHub from "@/components/ContactHub";
 import AdminDashboard from "@/components/AdminDashboard";
 import { SubscriptionChoice } from "@/components/SubscriptionChoice";
