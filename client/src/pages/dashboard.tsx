@@ -5,7 +5,8 @@ import ModuleNavigation from "@/components/ModuleNavigation";
 import BrandingBuilder from "@/components/BrandingBuilder";
 import MVPBuilder from "@/components/MVPBuilder";
 import MarketingBuilder from "@/components/MarketingBuilder";
-import LearnEarnLoop from "@/components/LearnEarnLoop";
+import LearnEarnLoopBuilder from "@/components/LearnEarnLoopBuilder";
+import BoltzAgent from "@/components/BoltzAgent";
 import ContactHub from "@/components/ContactHub";
 import AdminDashboard from "@/components/AdminDashboard";
 import { SubscriptionChoice } from "@/components/SubscriptionChoice";
@@ -56,7 +57,9 @@ export default function Dashboard() {
       case "marketing":
         return <MarketingBuilder />;
       case "quiz":
-        return <LearnEarnLoop />;
+        return <LearnEarnLoopBuilder />;
+      case "ai-agent":
+        return <BoltzAgent />;
       case "contacts":
         return <ContactHub />;
       case "admin":
