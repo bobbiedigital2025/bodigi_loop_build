@@ -28,6 +28,19 @@ export interface IStorage {
   createContact(contact: InsertContact): Promise<Contact>;
   updateContactStatus(id: string, status: string): Promise<Contact>;
   searchContacts(query: string, ownerId?: string): Promise<Contact[]>;
+  getContacts(filters: { ownerId?: string; entryType?: string; status?: string }): Promise<Contact[]>;
+
+  // PDR Loop Methods
+  createLoopOutcome(outcome: {
+    contactEmail: string;
+    setNumber: number;
+    questionNumber: number;
+    answer: string;
+    timestamp: string;
+    rewardType: string;
+    rewardTitle: string;
+  }): Promise<any>;
+  getQuizTemplatesByOwner(ownerId: string): Promise<QuizTemplate[]>;
 
   // Brands
   getBrand(id: string): Promise<Brand | undefined>;
@@ -183,6 +196,46 @@ export class MemStorage implements IStorage {
       contact.name.toLowerCase().includes(searchTerm) ||
       contact.email.toLowerCase().includes(searchTerm)
     );
+  }
+
+  // PDR: Get contacts with filters for CRM
+  async getContacts(filters: { ownerId?: string; entryType?: string; status?: string }): Promise<Contact[]> {
+    let contacts = Array.from(this.contacts.values());
+    
+    if (filters.ownerId) {
+      contacts = contacts.filter(c => c.ownerId === filters.ownerId);
+    }
+    if (filters.entryType) {
+      contacts = contacts.filter(c => c.entryType === filters.entryType);
+    }
+    if (filters.status) {
+      contacts = contacts.filter(c => c.status === filters.status);
+    }
+    
+    return contacts;
+  }
+
+  // PDR: Loop Outcome tracking (would be in loop_outcomes table)
+  private loopOutcomes: Map<string, any> = new Map();
+
+  async createLoopOutcome(outcome: {
+    contactEmail: string;
+    setNumber: number;
+    questionNumber: number;
+    answer: string;
+    timestamp: string;
+    rewardType: string;
+    rewardTitle: string;
+  }): Promise<any> {
+    const id = randomUUID();
+    const outcomeRecord = { id, ...outcome };
+    this.loopOutcomes.set(id, outcomeRecord);
+    return outcomeRecord;
+  }
+
+  // PDR: Get quiz templates by owner
+  async getQuizTemplatesByOwner(ownerId: string): Promise<QuizTemplate[]> {
+    return Array.from(this.quizTemplates.values()).filter(template => template.mvpId.includes(ownerId));
   }
 
   // Brands

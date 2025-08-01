@@ -22,821 +22,810 @@ import {
   Sparkles,
   Crown,
   BookOpen,
-  DollarSign
+  DollarSign,
+  AlertTriangle,
+  MessageSquare,
+  Brain,
+  Rocket,
+  Shield
 } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-// Enhanced question structure with AI-generated content based on niche
-const generateLearnEarnQuestions = (niche: string) => {
-  const questionSets = {
-    "Business Growth": [
-      {
-        id: 1,
-        setNumber: 1,
-        title: "Foundation Assessment",
-        questions: [
-          {
-            questionNumber: 1,
-            question: "What's your biggest challenge in scaling your business?",
-            options: [
-              { id: "a", text: "Finding qualified leads consistently", value: "lead-generation" },
-              { id: "b", text: "Converting prospects into paying customers", value: "conversion" },
-              { id: "c", text: "Retaining customers long-term", value: "retention" }
-            ],
-            reward: {
-              type: "guide",
-              title: "Lead Generation Masterclass PDF",
-              description: "37-page guide with proven strategies",
-              value: "$97"
-            }
-          },
-          {
-            questionNumber: 2,
-            question: "How much time do you currently spend on repetitive marketing tasks?",
-            options: [
-              { id: "a", text: "More than 10 hours per week", value: "high-time" },
-              { id: "b", text: "5-10 hours per week", value: "medium-time" },
-              { id: "c", text: "Less than 5 hours per week", value: "low-time" }
-            ],
-            reward: {
-              type: "bonus",
-              title: "Automation Toolkit Bundle",
-              description: "Save 15+ hours weekly with these templates",
-              value: "$147"
-            }
-          },
-          {
-            questionNumber: 3,
-            question: "What's your current monthly revenue goal?",
-            options: [
-              { id: "a", text: "$10K - $25K per month", value: "starter" },
-              { id: "b", text: "$25K - $100K per month", value: "growth" },
-              { id: "c", text: "$100K+ per month", value: "scale" }
-            ],
-            reward: {
-              type: "course",
-              title: "Revenue Acceleration Workshop",
-              description: "90-minute strategy session recording",
-              value: "$197"
-            }
-          }
-        ],
-        mvpOffer: {
-          title: "Business Growth Accelerator",
-          description: "Complete system for consistent lead generation and conversion",
-          price: "$97/month",
-          features: ["Automated lead funnels", "Email sequences", "Analytics dashboard"]
-        }
-      }
-    ]
-  };
+// Types for PDR compliance
+type RewardType = {
+  type: 'pdf' | 'bonus_feature';
+  title: string;
+  description: string;
+  downloadUrl?: string;
+  featureId?: string;
+  isLastChance?: boolean;
+};
 
-  return questionSets["Business Growth"]; // Default for demo
+type QuestionType = {
+  questionNumber: number;
+  question: string;
+  options: Array<{
+    id: string;
+    text: string;
+    value: string;
+  }>;
+  reward: RewardType;
+};
+
+type QuestionSetType = {
+  setNumber: number;
+  title: string;
+  questions: QuestionType[];
+};
+
+type QuizProgressType = {
+  completedSets: number[];
+  earnedRewards: RewardType[];
+  answeredQuestions: Array<{
+    set: number;
+    question: number;
+    answer: string;
+  }>;
+};
+
+// PDR Compliant: 5 sets of 3 MVP-specific questions
+const createMVPQuestionSets = (mvpName: string, mvpFeatures: string[]): QuestionSetType[] => {
+  return [
+    {
+      setNumber: 1,
+      title: "Foundation Discovery",
+      questions: [
+        {
+          questionNumber: 1,
+          question: `What's your biggest challenge that ${mvpName} could solve?`,
+          options: [
+            { id: "a", text: "Time management and productivity", value: "productivity" },
+            { id: "b", text: "Lead generation and customer acquisition", value: "leads" },
+            { id: "c", text: "Workflow automation and efficiency", value: "automation" }
+          ],
+          reward: {
+            type: "pdf",
+            title: `${mvpName} Quick Start Guide`,
+            description: "Essential strategies to get started immediately",
+            downloadUrl: `/api/rewards/pdf/quickstart-${mvpName.toLowerCase().replace(/\s+/g, '-')}`
+          }
+        },
+        {
+          questionNumber: 2,
+          question: `How much time do you spend daily on tasks ${mvpName} could automate?`,
+          options: [
+            { id: "a", text: "3+ hours per day", value: "high" },
+            { id: "b", text: "1-3 hours per day", value: "medium" },
+            { id: "c", text: "Less than 1 hour per day", value: "low" }
+          ],
+          reward: {
+            type: "pdf",
+            title: "Time Optimization Blueprint",
+            description: "Proven framework to reclaim 10+ hours weekly",
+            downloadUrl: `/api/rewards/pdf/time-optimization`
+          }
+        },
+        {
+          questionNumber: 3,
+          question: `What's your expected ROI from implementing ${mvpName}?`,
+          options: [
+            { id: "a", text: "2-3x return within 90 days", value: "conservative" },
+            { id: "b", text: "5-10x return within 6 months", value: "aggressive" },
+            { id: "c", text: "Break-even within 30 days", value: "immediate" }
+          ],
+          reward: {
+            type: "bonus_feature",
+            title: mvpFeatures[0] || "Advanced Analytics Dashboard",
+            description: "Unlock this premium feature worth $97/month",
+            featureId: "feature_1"
+          }
+        }
+      ]
+    },
+    {
+      setNumber: 2,
+      title: "Strategy Alignment",
+      questions: [
+        {
+          questionNumber: 1,
+          question: `Which aspect of ${mvpName} interests you most?`,
+          options: [
+            { id: "a", text: "Automated workflows and processes", value: "automation" },
+            { id: "b", text: "Data insights and analytics", value: "analytics" },
+            { id: "c", text: "Integration with existing tools", value: "integration" }
+          ],
+          reward: {
+            type: "pdf",
+            title: "Advanced Strategy Guide",
+            description: "Deep-dive tactics for maximum results",
+            downloadUrl: `/api/rewards/pdf/advanced-strategy`
+          }
+        },
+        {
+          questionNumber: 2,
+          question: `What's your current tech stack proficiency level?`,
+          options: [
+            { id: "a", text: "Beginner - need guidance", value: "beginner" },
+            { id: "b", text: "Intermediate - can follow tutorials", value: "intermediate" },
+            { id: "c", text: "Advanced - prefer customization", value: "advanced" }
+          ],
+          reward: {
+            type: "pdf",
+            title: "Implementation Roadmap",
+            description: "Step-by-step setup guide tailored to your level",
+            downloadUrl: `/api/rewards/pdf/implementation-roadmap`
+          }
+        },
+        {
+          questionNumber: 3,
+          question: `How quickly do you need to see results from ${mvpName}?`,
+          options: [
+            { id: "a", text: "Within the first week", value: "immediate" },
+            { id: "b", text: "Within the first month", value: "short_term" },
+            { id: "c", text: "Within 3 months", value: "long_term" }
+          ],
+          reward: {
+            type: "bonus_feature",
+            title: mvpFeatures[1] || "Priority Support Channel",
+            description: "Get direct access to our expert team",
+            featureId: "feature_2"
+          }
+        }
+      ]
+    },
+    {
+      setNumber: 3,
+      title: "Implementation Focus",
+      questions: [
+        {
+          questionNumber: 1,
+          question: `What's your biggest concern about adopting ${mvpName}?`,
+          options: [
+            { id: "a", text: "Learning curve and complexity", value: "complexity" },
+            { id: "b", text: "Integration with current systems", value: "integration" },
+            { id: "c", text: "Time investment required", value: "time" }
+          ],
+          reward: {
+            type: "pdf",
+            title: "Risk Mitigation Guide",
+            description: "How to minimize challenges and maximize success",
+            downloadUrl: `/api/rewards/pdf/risk-mitigation`
+          }
+        },
+        {
+          questionNumber: 2,
+          question: `Which success metric matters most to you?`,
+          options: [
+            { id: "a", text: "Time saved per week", value: "time_saved" },
+            { id: "b", text: "Revenue increase", value: "revenue" },
+            { id: "c", text: "Stress reduction", value: "stress" }
+          ],
+          reward: {
+            type: "pdf",
+            title: "Success Metrics Tracker",
+            description: "Templates to measure and optimize your results",
+            downloadUrl: `/api/rewards/pdf/success-metrics`
+          }
+        },
+        {
+          questionNumber: 3,
+          question: `How important is ongoing support and training?`,
+          options: [
+            { id: "a", text: "Critical - I need hands-on guidance", value: "critical" },
+            { id: "b", text: "Important - prefer self-service resources", value: "moderate" },
+            { id: "c", text: "Not important - I'm self-sufficient", value: "minimal" }
+          ],
+          reward: {
+            type: "bonus_feature",
+            title: mvpFeatures[2] || "White-Glove Onboarding",
+            description: "Personal setup session with our specialists",
+            featureId: "feature_3"
+          }
+        }
+      ]
+    },
+    {
+      setNumber: 4,
+      title: "Optimization Strategy",
+      questions: [
+        {
+          questionNumber: 1,
+          question: `What's your target growth rate with ${mvpName}?`,
+          options: [
+            { id: "a", text: "50% improvement in 90 days", value: "moderate" },
+            { id: "b", text: "100% improvement in 6 months", value: "aggressive" },
+            { id: "c", text: "200%+ improvement in 1 year", value: "exponential" }
+          ],
+          reward: {
+            type: "pdf",
+            title: "Growth Acceleration Playbook",
+            description: "Advanced strategies for rapid scaling",
+            downloadUrl: `/api/rewards/pdf/growth-acceleration`
+          }
+        },
+        {
+          questionNumber: 2,
+          question: `Which advanced feature would be most valuable?`,
+          options: [
+            { id: "a", text: "AI-powered insights and recommendations", value: "ai_insights" },
+            { id: "b", text: "Custom automation workflows", value: "custom_automation" },
+            { id: "c", text: "Advanced reporting and analytics", value: "advanced_analytics" }
+          ],
+          reward: {
+            type: "pdf",
+            title: "Advanced Features Guide",
+            description: "Unlock the full potential of premium capabilities",
+            downloadUrl: `/api/rewards/pdf/advanced-features`
+          }
+        },
+        {
+          questionNumber: 3,
+          question: `How do you prefer to scale your operations?`,
+          options: [
+            { id: "a", text: "Gradual, sustainable growth", value: "sustainable" },
+            { id: "b", text: "Rapid expansion with calculated risks", value: "rapid" },
+            { id: "c", text: "Conservative approach with proven methods", value: "conservative" }
+          ],
+          reward: {
+            type: "bonus_feature",
+            title: mvpFeatures[3] || "Enterprise Scaling Suite",
+            description: "Tools designed for high-growth scenarios",
+            featureId: "feature_4"
+          }
+        }
+      ]
+    },
+    {
+      setNumber: 5,
+      title: "Final Mastery & Last Chance",
+      questions: [
+        {
+          questionNumber: 1,
+          question: `What would prevent you from achieving 10x ROI with ${mvpName}?`,
+          options: [
+            { id: "a", text: "Lack of consistent implementation", value: "consistency" },
+            { id: "b", text: "Insufficient market knowledge", value: "knowledge" },
+            { id: "c", text: "Limited budget for optimization", value: "budget" }
+          ],
+          reward: {
+            type: "pdf",
+            title: "10x ROI Blueprint",
+            description: "Case studies and exact frameworks for exponential returns",
+            downloadUrl: `/api/rewards/pdf/10x-roi-blueprint`
+          }
+        },
+        {
+          questionNumber: 2,
+          question: `If you could wave a magic wand, what would be your ideal outcome?`,
+          options: [
+            { id: "a", text: "Complete business automation", value: "automation" },
+            { id: "b", text: "10x revenue within 12 months", value: "revenue" },
+            { id: "c", text: "Freedom to focus on strategy only", value: "freedom" }
+          ],
+          reward: {
+            type: "pdf",
+            title: "Ultimate Success Roadmap",
+            description: "The complete path to achieving your ideal outcome",
+            downloadUrl: `/api/rewards/pdf/ultimate-success`
+          }
+        },
+        {
+          questionNumber: 3,
+          question: `This is your LAST CHANCE to unlock all bonuses. Are you ready to commit?`,
+          options: [
+            { id: "a", text: "Yes! I'm ready to transform my business", value: "commit" },
+            { id: "b", text: "I need more information first", value: "hesitant" },
+            { id: "c", text: "No, I'll continue without the bonuses", value: "decline" }
+          ],
+          reward: {
+            type: "bonus_feature",
+            title: mvpFeatures[4] || "Lifetime VIP Access",
+            description: "⚠️ WARNING: This offer expires after this question!",
+            featureId: "feature_5",
+            isLastChance: true
+          }
+        }
+      ]
+    }
+  ];
 };
 
 export default function LearnEarnLoop() {
   const { toast } = useToast();
-  const [setupMode, setSetupMode] = useState(true);
-  const [loopConfig, setLoopConfig] = useState({
-    niche: "",
-    targetAudience: "",
-    mainProblem: "",
-    mvpTitle: "",
-    mvpPrice: "",
-    leadMagnet: ""
-  });
-
-  // Generated loop state
-  const [generatedLoop, setGeneratedLoop] = useState<any>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
   
-  // Quiz taking state
-  const [contactInfo, setContactInfo] = useState({ name: "", email: "" });
-  const [hasStarted, setHasStarted] = useState(false);
-  const [currentSetIndex, setCurrentSetIndex] = useState(0);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState("");
-  const [userAnswers, setUserAnswers] = useState<any[]>([]);
-  const [completedRewards, setCompletedRewards] = useState<string[]>([]);
-  const [showMVPOffer, setShowMVPOffer] = useState(false);
-
-  const generateLoopMutation = useMutation({
-    mutationFn: async () => {
-      setIsGenerating(true);
-      
-      // Simulate AI generation delay
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      const questionSets = generateLearnEarnQuestions(loopConfig.niche);
-      
-      return {
-        id: `loop-${Date.now()}`,
-        title: `${loopConfig.niche} Learn & Earn Loop™`,
-        description: `Gamified assessment that educates ${loopConfig.targetAudience} while qualifying leads`,
-        questionSets,
-        shareableUrl: `https://loop.bodigi.com/${loopConfig.niche.toLowerCase().replace(/\s+/g, '-')}-assessment`,
-        analytics: {
-          completionRate: 0,
-          leadConversion: 0,
-          avgTimeSpent: 0
-        },
-        config: loopConfig
-      };
-    },
-    onSuccess: (data) => {
-      setGeneratedLoop(data);
-      setIsGenerating(false);
-      setSetupMode(false);
-      toast({
-        title: "🎮 Learn & Earn Loop Generated!",
-        description: "Your gamified marketing assessment is ready to capture leads.",
-      });
-    },
-    onError: () => {
-      setIsGenerating(false);
-      toast({
-        title: "Generation Failed",
-        description: "There was an error generating your loop. Please try again.",
-        variant: "destructive",
-      });
-    }
+  // Contact capture state (PDR: stored with entry_type: 'learn_and_earn')
+  const [contactInfo, setContactInfo] = useState({
+    name: "",
+    email: ""
   });
+  const [isContactCaptured, setIsContactCaptured] = useState(false);
+  
+  // Quiz state
+  const [currentSet, setCurrentSet] = useState(1);
+  const [currentQuestion, setCurrentQuestion] = useState(1);
+  const [selectedAnswer, setSelectedAnswer] = useState("");
+  const [quizProgress, setQuizProgress] = useState<QuizProgressType>({
+    completedSets: [],
+    earnedRewards: [],
+    answeredQuestions: []
+  });
+  
+  // MVP selection (with 5 paid features per PDR)
+  const [selectedMVP, setSelectedMVP] = useState({
+    name: "Business Growth Accelerator",
+    features: [
+      "Advanced Analytics Dashboard",
+      "Priority Support Channel", 
+      "White-Glove Onboarding",
+      "Enterprise Scaling Suite",
+      "Lifetime VIP Access"
+    ]
+  });
+  
+  // State management
+  const [showMVPOffer, setShowMVPOffer] = useState(false);
+  const [showBonusWarning, setShowBonusWarning] = useState(false);
+  const [showAuraChat, setShowAuraChat] = useState(false);
+  const [auraMessage, setAuraMessage] = useState("");
+  
+  const questionSets = createMVPQuestionSets(selectedMVP.name, selectedMVP.features);
+  const currentQuestionSet = questionSets[currentSet - 1];
+  const currentQuestionData = currentQuestionSet?.questions[currentQuestion - 1];
+  
+  // Calculate progress (5 sets × 3 questions = 15 total)
+  const totalQuestions = 15;
+  const completedQuestions = ((currentSet - 1) * 3) + (currentQuestion - 1);
+  const progressPercentage = (completedQuestions / totalQuestions) * 100;
 
-  const submitAnswerMutation = useMutation({
-    mutationFn: async (answerData: any) => {
-      return apiRequest("POST", "/api/loop-answers", {
-        loopId: generatedLoop.id,
-        ...answerData,
-        timestamp: new Date().toISOString()
+  // Contact capture mutation (PDR: stored with entry_type: 'learn_and_earn')
+  const captureContactMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", "/api/contacts", {
+        name: contactInfo.name,
+        email: contactInfo.email,
+        ownerId: "demo-user-id", // In real app, get from auth
+        entryType: "learn_and_earn",
+        status: "lead",
+        mvpId: selectedMVP.name,
+        tags: ["quiz_participant"]
       });
     },
     onSuccess: () => {
-      const currentSet = generatedLoop.questionSets[currentSetIndex];
-      const currentQuestion = currentSet.questions[currentQuestionIndex];
-      
-      // Add reward to completed list
-      setCompletedRewards(prev => [...prev, `${currentSetIndex}-${currentQuestionIndex}`]);
-      
-      // Progress to next question or show MVP offer
-      if (currentQuestionIndex < currentSet.questions.length - 1) {
-        setCurrentQuestionIndex(prev => prev + 1);
-      } else if (currentSetIndex < generatedLoop.questionSets.length - 1) {
-        setCurrentSetIndex(prev => prev + 1);
-        setCurrentQuestionIndex(0);
-      } else {
-        setShowMVPOffer(true);
-      }
-      
-      setSelectedAnswer("");
-      
+      setIsContactCaptured(true);
       toast({
-        title: "🎁 Reward Unlocked!",
-        description: `You've earned: ${currentQuestion.reward.title}`,
+        title: "🎯 Welcome to the Learn & Earn Loop!",
+        description: "Let's discover the perfect rewards for you.",
       });
     }
   });
 
-  const handleAnswerSubmit = () => {
-    if (!selectedAnswer) return;
-    
-    const answerData = {
-      contactInfo,
-      setIndex: currentSetIndex,
-      questionIndex: currentQuestionIndex,
-      selectedAnswer,
-      userAnswers: [...userAnswers, { 
-        question: currentQuestionIndex, 
-        answer: selectedAnswer,
-        timestamp: new Date().toISOString()
-      }]
-    };
-    
-    setUserAnswers(answerData.userAnswers);
-    submitAnswerMutation.mutate(answerData);
-  };
-
-  const shareLoop = () => {
-    navigator.clipboard.writeText(generatedLoop.shareableUrl);
-    toast({
-      title: "🔗 Link Copied!",
-      description: "Share your Learn & Earn Loop to start capturing leads.",
-    });
-  };
-
-  if (setupMode) {
-    return (
-      <div className="space-y-8">
-        {/* Header */}
-        <div className="bg-bodigi-gradient text-white p-8 rounded-2xl shadow-bodigi">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="bg-white/20 p-3 rounded-xl">
-              <Target className="h-8 w-8 text-bodigi-gold" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold">Learn & Earn Engagement Loop™</h1>
-              <p className="text-white/90 text-lg">Gamified marketing that educates prospects while qualifying leads</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-            <div className="bg-white/10 p-4 rounded-lg">
-              <h3 className="font-semibold mb-2">🎯 Lead Qualification</h3>
-              <p className="text-sm text-white/80">5 strategic questions per set</p>
-            </div>
-            <div className="bg-white/10 p-4 rounded-lg">
-              <h3 className="font-semibold mb-2">🎁 Instant Rewards</h3>
-              <p className="text-sm text-white/80">Valuable prizes for each answer</p>
-            </div>
-            <div className="bg-white/10 p-4 rounded-lg">
-              <h3 className="font-semibold mb-2">💰 Soft MVP Sells</h3>
-              <p className="text-sm text-white/80">Natural product introductions</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Setup Form */}
-        <Card className="shadow-bodigi">
-          <CardHeader className="bg-gray-50 border-b">
-            <CardTitle className="text-xl font-bold text-black flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-bodigi-gold" />
-              Configure Your Loop
-            </CardTitle>
-            <p className="text-gray-600">Set up your gamified marketing assessment</p>
-          </CardHeader>
-          <CardContent className="p-6 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold text-black">Business Niche</Label>
-                <Input 
-                  placeholder="e.g., Business Growth, Health & Wellness"
-                  value={loopConfig.niche}
-                  onChange={(e) => setLoopConfig(prev => ({ ...prev, niche: e.target.value }))}
-                  className="border-2 focus:border-bodigi-gold"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold text-black">Target Audience</Label>
-                <Input 
-                  placeholder="e.g., Small business owners, Entrepreneurs"
-                  value={loopConfig.targetAudience}
-                  onChange={(e) => setLoopConfig(prev => ({ ...prev, targetAudience: e.target.value }))}
-                  className="border-2 focus:border-bodigi-gold"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-semibold text-black">Main Problem You Solve</Label>
-              <Textarea
-                placeholder="What's the primary challenge your business helps solve?"
-                value={loopConfig.mainProblem}
-                onChange={(e) => setLoopConfig(prev => ({ ...prev, mainProblem: e.target.value }))}
-                className="border-2 focus:border-bodigi-gold min-h-[80px]"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold text-black">MVP/Product Title</Label>
-                <Input 
-                  placeholder="What you'll soft-sell in the loop"
-                  value={loopConfig.mvpTitle}
-                  onChange={(e) => setLoopConfig(prev => ({ ...prev, mvpTitle: e.target.value }))}
-                  className="border-2 focus:border-bodigi-gold"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold text-black">Product Price</Label>
-                <Input 
-                  placeholder="e.g., $97/month or $297 one-time"
-                  value={loopConfig.mvpPrice}
-                  onChange={(e) => setLoopConfig(prev => ({ ...prev, mvpPrice: e.target.value }))}
-                  className="border-2 focus:border-bodigi-gold"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-semibold text-black">Lead Magnet Theme</Label>
-              <Input 
-                placeholder="e.g., Ultimate Guide, Toolkit, Masterclass"
-                value={loopConfig.leadMagnet}
-                onChange={(e) => setLoopConfig(prev => ({ ...prev, leadMagnet: e.target.value }))}
-                className="border-2 focus:border-bodigi-gold"
-              />
-            </div>
-
-            <Button 
-              onClick={() => generateLoopMutation.mutate()}
-              disabled={!loopConfig.niche || !loopConfig.targetAudience || !loopConfig.mainProblem || isGenerating}
-              className="w-full h-12 bg-bodigi-gradient text-white font-bold text-lg rounded-xl hover:shadow-lg hover-lift"
-            >
-              {isGenerating ? (
-                <>
-                  <Target className="mr-2 h-5 w-5 animate-spin" />
-                  Generating Your Loop...
-                </>
-              ) : (
-                <>
-                  <Zap className="mr-2 h-5 w-5" />
-                  Generate Learn & Earn Loop
-                </>
-              )}
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Quiz Interface (when taking the actual quiz)
-  if (hasStarted && generatedLoop) {
-    const currentSet = generatedLoop.questionSets[currentSetIndex];
-    const currentQuestion = currentSet.questions[currentQuestionIndex];
-    const totalQuestions = generatedLoop.questionSets.reduce((total: number, set: any) => total + set.questions.length, 0);
-    const currentQuestionNum = currentSetIndex * 3 + currentQuestionIndex + 1;
-    const progress = (currentQuestionNum / totalQuestions) * 100;
-
-    if (showMVPOffer) {
-      return (
-        <div className="max-w-4xl mx-auto">
-          <Card className="shadow-bodigi overflow-hidden">
-            <div className="bg-bodigi-gradient text-white p-8 text-center">
-              <Trophy className="h-16 w-16 text-bodigi-gold mx-auto mb-4" />
-              <h1 className="text-3xl font-bold mb-2">Congratulations, {contactInfo.name}!</h1>
-              <p className="text-xl text-white/90">You've completed the assessment and earned amazing rewards!</p>
-            </div>
-            
-            <CardContent className="p-8">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-black mb-4">Your Rewards Summary</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {completedRewards.map((rewardId, idx) => {
-                    const [setIdx, qIdx] = rewardId.split('-').map(Number);
-                    const reward = generatedLoop.questionSets[setIdx].questions[qIdx].reward;
-                    return (
-                      <div key={rewardId} className="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <Gift className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                        <h3 className="font-semibold text-sm">{reward.title}</h3>
-                        <Badge className="bg-green-500 text-white mt-2">{reward.value}</Badge>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="bg-bodigi-gradient text-white p-6 rounded-xl text-center mb-6">
-                <Crown className="h-12 w-12 text-bodigi-gold mx-auto mb-4" />
-                <h3 className="text-2xl font-bold mb-2">Special Offer Just for You!</h3>
-                <h4 className="text-xl font-semibold text-bodigi-gold mb-2">{currentSet.mvpOffer.title}</h4>
-                <p className="text-lg mb-4">{currentSet.mvpOffer.description}</p>
-                <div className="text-3xl font-bold mb-4">{currentSet.mvpOffer.price}</div>
-                <ul className="text-left max-w-md mx-auto mb-6">
-                  {currentSet.mvpOffer.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center gap-2 mb-2">
-                      <CheckCircle className="h-4 w-4 text-bodigi-gold" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Button className="bg-bodigi-gold text-black hover:bg-yellow-400 font-bold text-lg px-8 py-3">
-                  <DollarSign className="mr-2 h-5 w-5" />
-                  Get Instant Access
-                </Button>
-              </div>
-
-              <div className="text-center">
-                <p className="text-gray-600 mb-4">Your rewards have been sent to {contactInfo.email}</p>
-                <Button variant="outline" onClick={() => window.location.reload()}>
-                  Start New Assessment
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      );
+  // Answer submission and reward processing
+  const submitAnswerMutation = useMutation({
+    mutationFn: async (answer: string) => {
+      // Store answer and process reward (PDR compliant)
+      return apiRequest("POST", "/api/quiz/answer", {
+        contactEmail: contactInfo.email,
+        setNumber: currentSet,
+        questionNumber: currentQuestion,
+        answer: answer,
+        reward: currentQuestionData?.reward
+      });
+    },
+    onSuccess: (data) => {
+      // Add reward to earned rewards
+      if (currentQuestionData?.reward) {
+        setQuizProgress(prev => ({
+          ...prev,
+          earnedRewards: [...prev.earnedRewards, currentQuestionData.reward],
+          answeredQuestions: [...prev.answeredQuestions, {
+            set: currentSet,
+            question: currentQuestion,
+            answer: selectedAnswer
+          }]
+        }));
+        
+        // Show reward notification
+        toast({
+          title: `🎁 Reward Unlocked: ${currentQuestionData.reward.title}`,
+          description: currentQuestionData.reward.description,
+        });
+      }
+      
+      // Move to next question or show MVP offer
+      if (currentQuestion === 3) {
+        // End of set - show MVP offer
+        setShowMVPOffer(true);
+        
+        // Check if this is the final set
+        if (currentSet === 5 && currentQuestion === 3) {
+          setShowBonusWarning(true);
+        }
+      } else {
+        // Move to next question
+        setCurrentQuestion(prev => prev + 1);
+      }
+      
+      setSelectedAnswer("");
     }
+  });
 
+  // MVP purchase handler (PDR: customer conversion)
+  const handleMVPPurchase = () => {
+    // Store as customer in PDR system
+    apiRequest("POST", "/api/contacts", {
+      name: contactInfo.name,
+      email: contactInfo.email,
+      ownerId: "demo-user-id",
+      entryType: "mvp_checkout",
+      status: "customer",
+      mvpId: selectedMVP.name
+    });
+    
+    // Redirect to checkout with bonus features applied
+    window.location.href = `/checkout?mvp=${selectedMVP.name}&bonuses=${quizProgress.earnedRewards.filter(r => r.type === 'bonus_feature').map(r => r.featureId).join(',')}`;
+  };
+
+  // Decline MVP offer - move to next set (or final warning)
+  const handleDeclineMVP = () => {
+    setShowMVPOffer(false);
+    
+    if (currentSet === 5) {
+      // Final decline - show Aura chat (PDR requirement)
+      setShowAuraChat(true);
+      setAuraMessage("I understand you're not ready to purchase yet. However, I must warn you that all the bonus features you've unlocked will expire permanently if you don't act now. This is truly your last opportunity to get these exclusive bonuses worth over $500. Can I help you with any concerns about the purchase?");
+    } else {
+      // Move to next set
+      setCurrentSet(prev => prev + 1);
+      setCurrentQuestion(1);
+    }
+  };
+
+  // Handle contact form submission
+  const handleContactSubmit = () => {
+    if (!contactInfo.name || !contactInfo.email) {
+      toast({
+        title: "Information Required",
+        description: "Please enter your name and email to begin the Learn & Earn Loop.",
+        variant: "destructive",
+      });
+      return;
+    }
+    captureContactMutation.mutate();
+  };
+
+  // Handle answer submission
+  const handleAnswerSubmit = () => {
+    if (!selectedAnswer) {
+      toast({
+        title: "Answer Required",
+        description: "Please select an answer before continuing.",
+        variant: "destructive",
+      });
+      return;
+    }
+    submitAnswerMutation.mutate(selectedAnswer);
+  };
+
+  // Contact capture form (PDR requirement)
+  if (!isContactCaptured) {
     return (
-      <div className="max-w-4xl mx-auto">
-        <Card className="shadow-bodigi">
-          <CardHeader className="bg-bodigi-gradient text-white">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-2xl font-bold">
-                  {currentSet.title} - Question {currentQuestion.questionNumber}
-                </CardTitle>
-                <p className="text-white/90">Progress: {Math.round(progress)}% Complete</p>
-              </div>
-              <div className="text-right">
-                <div className="bg-white/20 p-3 rounded-lg">
-                  <Gift className="h-6 w-6 text-bodigi-gold" />
-                </div>
-              </div>
+      <div className="max-w-2xl mx-auto">
+        <Card className="shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-center">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Trophy className="h-8 w-8 text-yellow-300" />
+              <CardTitle className="text-3xl font-bold">BoDiGi™ Learn & Earn Loop</CardTitle>
             </div>
-            <Progress value={progress} className="mt-4 bg-white/20" />
+            <p className="text-lg">Unlock valuable rewards while we create your perfect solution!</p>
           </CardHeader>
           
           <CardContent className="p-8">
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-black mb-6">{currentQuestion.question}</h2>
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold mb-4">Before we begin...</h2>
+              <p className="text-gray-600 mb-6">
+                Enter your information to unlock personalized rewards worth over $500+
+              </p>
               
-              <RadioGroup value={selectedAnswer} onValueChange={setSelectedAnswer}>
-                <div className="space-y-4">
-                  {currentQuestion.options.map((option) => (
-                    <div key={option.id} className="flex items-start space-x-3">
-                      <RadioGroupItem value={option.value} id={option.id} className="mt-1" />
-                      <Label htmlFor={option.id} className="cursor-pointer flex-1">
-                        <div className="p-4 border-2 border-gray-200 rounded-lg hover:border-bodigi-gold transition-colors">
-                          <p className="font-semibold mb-1">{option.text}</p>
-                        </div>
-                      </Label>
-                    </div>
-                  ))}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <BookOpen className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+                  <h3 className="font-semibold">Exclusive PDFs</h3>
+                  <p className="text-sm text-gray-600">Industry guides & blueprints</p>
                 </div>
-              </RadioGroup>
-            </div>
-
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
-              <div className="flex items-center gap-3 mb-3">
-                <Gift className="h-6 w-6 text-yellow-600" />
-                <h3 className="font-bold text-lg">Reward for This Question</h3>
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <Gift className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                  <h3 className="font-semibold">Bonus Features</h3>
+                  <p className="text-sm text-gray-600">Premium MVP add-ons</p>
+                </div>
+                <div className="bg-yellow-50 p-4 rounded-lg">
+                  <Crown className="h-8 w-8 text-yellow-600 mx-auto mb-2" />
+                  <h3 className="font-semibold">VIP Access</h3>
+                  <p className="text-sm text-gray-600">Exclusive support & training</p>
+                </div>
               </div>
-              <h4 className="font-semibold text-lg text-black">{currentQuestion.reward.title}</h4>
-              <p className="text-gray-600 mb-2">{currentQuestion.reward.description}</p>
-              <Badge className="bg-yellow-500 text-white">{currentQuestion.reward.value} Value</Badge>
             </div>
-
-            <Button 
-              onClick={handleAnswerSubmit}
-              disabled={!selectedAnswer || submitAnswerMutation.isPending}
-              className="w-full h-12 bg-bodigi-gradient text-white font-bold text-lg rounded-xl hover:shadow-lg hover-lift"
-            >
-              {submitAnswerMutation.isPending ? (
-                "Unlocking Reward..."
-              ) : (
-                <>
-                  Unlock My Reward & Continue
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </>
-              )}
-            </Button>
+            
+            <div className="space-y-4 max-w-md mx-auto">
+              <div>
+                <Label htmlFor="name" className="text-sm font-semibold">Your Name *</Label>
+                <Input
+                  id="name"
+                  value={contactInfo.name}
+                  onChange={(e) => setContactInfo(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Enter your full name"
+                  className="mt-1"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="email" className="text-sm font-semibold">Email Address *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={contactInfo.email}
+                  onChange={(e) => setContactInfo(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder="Enter your email address"
+                  className="mt-1"
+                />
+              </div>
+              
+              <Button
+                onClick={handleContactSubmit}
+                disabled={captureContactMutation.isPending}
+                className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold text-lg"
+              >
+                {captureContactMutation.isPending ? "Starting Your Journey..." : "🚀 Start My Learn & Earn Journey"}
+              </Button>
+              
+              <p className="text-xs text-gray-500 text-center">
+                By continuing, you agree to receive educational content and product updates. Unsubscribe anytime.
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  // Loop Management Interface
   return (
-    <div className="space-y-8">
-      {/* Generated Loop Preview */}
-      <Card className="shadow-bodigi">
-        <CardHeader className="bg-bodigi-gradient text-white">
-          <div className="flex items-center justify-between">
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Progress header */}
+      <Card className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <CardTitle className="text-2xl font-bold">{generatedLoop.title}</CardTitle>
-              <p className="text-white/90 text-lg">{generatedLoop.description}</p>
+              <h1 className="text-2xl font-bold">Learn & Earn Loop™</h1>
+              <p className="text-white/90">Set {currentSet} of 5 • Question {currentQuestion} of 3</p>
             </div>
-            <div className="flex gap-2">
-              <Button 
-                onClick={shareLoop}
-                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
-              >
-                <Share2 className="mr-2 h-4 w-4" />
-                Share Loop
-              </Button>
-              <Button 
-                onClick={() => setHasStarted(true)}
-                className="bg-bodigi-gold text-black hover:bg-yellow-400 font-semibold"
-              >
-                <Play className="mr-2 h-4 w-4" />
-                Preview Quiz
-              </Button>
+            <div className="text-right">
+              <p className="text-sm text-white/90">Progress</p>
+              <p className="text-xl font-bold">{Math.round(progressPercentage)}%</p>
             </div>
           </div>
-        </CardHeader>
-        
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div className="bg-blue-50 p-4 rounded-lg text-center">
-              <Eye className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-              <h3 className="font-bold text-lg">0</h3>
-              <p className="text-gray-600">Total Views</p>
-            </div>
-            <div className="bg-green-50 p-4 rounded-lg text-center">
-              <Target className="h-8 w-8 text-green-600 mx-auto mb-2" />
-              <h3 className="font-bold text-lg">0%</h3>
-              <p className="text-gray-600">Completion Rate</p>
-            </div>
-            <div className="bg-purple-50 p-4 rounded-lg text-center">
-              <Crown className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-              <h3 className="font-bold text-lg">0</h3>
-              <p className="text-gray-600">Leads Generated</p>
-            </div>
-          </div>
-
-          <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-            <h3 className="font-bold text-lg mb-2">Shareable URL</h3>
-            <div className="flex items-center gap-2">
-              <Input 
-                value={generatedLoop.shareableUrl} 
-                readOnly 
-                className="bg-white"
-              />
-              <Button onClick={shareLoop} variant="outline">
-                <Share2 className="h-4 w-4" />
-              </Button>
-            </div>
+          <Progress value={progressPercentage} className="h-2 bg-white/20" />
+          
+          <div className="mt-4 flex items-center gap-4">
+            <Badge variant="secondary" className="bg-white/20 text-white">
+              Rewards Earned: {quizProgress.earnedRewards.length}
+            </Badge>
+            <Badge variant="secondary" className="bg-white/20 text-white">
+              MVP: {selectedMVP.name}
+            </Badge>
           </div>
         </CardContent>
       </Card>
 
-      {/* Quick Quiz Start */}
-      <Card className="shadow-bodigi">
-        <CardHeader>
-          <CardTitle>Test Your Loop</CardTitle>
-          <p className="text-gray-600">Experience the quiz from your customer's perspective</p>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="max-w-md mx-auto space-y-4">
-            <div className="space-y-2">
-              <Label>Name</Label>
-              <Input 
-                placeholder="Enter your name"
-                value={contactInfo.name}
-                onChange={(e) => setContactInfo(prev => ({ ...prev, name: e.target.value }))}
-              />
+      {/* Current question */}
+      {currentQuestionData && !showMVPOffer && !showAuraChat && (
+        <Card className="shadow-lg">
+          <CardHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="bg-purple-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">
+                {currentQuestion}
+              </div>
+              <CardTitle className="text-xl">{currentQuestionSet.title}</CardTitle>
             </div>
-            <div className="space-y-2">
-              <Label>Email</Label>
-              <Input 
-                type="email"
-                placeholder="Enter your email"
-                value={contactInfo.email}
-                onChange={(e) => setContactInfo(prev => ({ ...prev, email: e.target.value }))}
-              />
-            </div>
-            <Button 
-              onClick={() => setHasStarted(true)}
-              disabled={!contactInfo.name || !contactInfo.email}
-              className="w-full bg-bodigi-gradient text-white font-bold hover-lift"
-            >
-              <Play className="mr-2 h-4 w-4" />
-              Start Assessment
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-  
-  const question = mockQuestions[currentQuestion];
-  const progress = ((currentQuestion + 1) / 15) * 100; // 5 sets × 3 questions = 15 total
-
-  const startQuizMutation = useMutation({
-    mutationFn: async () => {
-      if (!contactInfo.name || !contactInfo.email) {
-        throw new Error("Please enter your name and email");
-      }
-      
-      // Create contact
-      const contactResponse = await apiRequest("POST", "/api/contacts", {
-        name: contactInfo.name,
-        email: contactInfo.email,
-        ownerId: "demo-user-id",
-        entryType: "learn_and_earn",
-        status: "lead"
-      });
-      const contact = await contactResponse.json();
-      
-      // Create quiz session
-      await apiRequest("POST", "/api/quiz-sessions", {
-        contactId: contact.id,
-        mvpId: "demo-mvp-id",
-        currentSet: 1,
-        currentQuestion: 1
-      });
-      
-      return contact;
-    },
-    onSuccess: () => {
-      setHasStarted(true);
-      queryClient.invalidateQueries({ queryKey: ["/api/contacts"] });
-      toast({
-        title: "Quiz Started!",
-        description: "Welcome to your personalized learning experience.",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  });
-
-  const submitAnswerMutation = useMutation({
-    mutationFn: async () => {
-      if (!selectedAnswer) {
-        throw new Error("Please select an answer");
-      }
-      
-      // Generate PDF reward
-      const pdfResponse = await apiRequest("GET", `/api/generate-pdf/${question.reward.type}?mvpName=FlowBoost Pro&contactName=${contactInfo.name}`);
-      const pdfReward = await pdfResponse.json();
-      
-      return pdfReward;
-    },
-    onSuccess: (pdfData) => {
-      setCompletedRewards(prev => [...prev, question.reward.title]);
-      setSelectedAnswer("");
-      toast({
-        title: "Reward Unlocked!",
-        description: `You've earned: ${question.reward.title}`,
-      });
-      
-      // Move to next question (in real app, would check if more questions available)
-      if (currentQuestion < mockQuestions.length - 1) {
-        setCurrentQuestion(prev => prev + 1);
-      }
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  });
-
-  const downloadPDF = (rewardTitle: string) => {
-    // In real app, would download actual PDF
-    toast({
-      title: "Download Started",
-      description: `Downloading ${rewardTitle}...`,
-    });
-  };
-
-  if (!hasStarted) {
-    return (
-      <Card className="overflow-hidden">
-        <CardHeader className="border-b border-slate-200">
-          <CardTitle className="text-xl font-semibold text-slate-900">Learn & Earn Loop Builder</CardTitle>
-          <p className="text-sm text-slate-600">Create personalized quiz experiences that convert to sales</p>
-        </CardHeader>
-        
-        <CardContent className="p-6">
-          <div className="max-w-md mx-auto">
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Get Started with Your Personalized Quiz</h3>
+          </CardHeader>
+          
+          <CardContent className="p-6">
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold mb-4">{currentQuestionData.question}</h2>
               
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input 
-                    id="name"
-                    placeholder="Your name"
-                    value={contactInfo.name}
-                    onChange={(e) => setContactInfo(prev => ({ ...prev, name: e.target.value }))}
-                  />
+              <RadioGroup value={selectedAnswer} onValueChange={setSelectedAnswer}>
+                {currentQuestionData.options.map((option) => (
+                  <div key={option.id} className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
+                    <RadioGroupItem value={option.value} id={option.id} />
+                    <Label htmlFor={option.id} className="flex-1 cursor-pointer">
+                      {option.text}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+            
+            {/* Reward preview */}
+            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center gap-3">
+                {currentQuestionData.reward.type === 'pdf' ? <BookOpen className="h-6 w-6 text-yellow-600" /> : <Gift className="h-6 w-6 text-yellow-600" />}
+                <div>
+                  <h3 className="font-semibold text-gray-800">Reward: {currentQuestionData.reward.title}</h3>
+                  <p className="text-sm text-gray-600">{currentQuestionData.reward.description}</p>
+                  {currentQuestionData.reward.isLastChance && (
+                    <Badge variant="destructive" className="mt-1">⚠️ LAST CHANCE!</Badge>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            <Button
+              onClick={handleAnswerSubmit}
+              disabled={!selectedAnswer || submitAnswerMutation.isPending}
+              className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold"
+            >
+              {submitAnswerMutation.isPending ? "Processing..." : `Unlock Reward & Continue`}
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* MVP Offer (shown after each set of 3 questions) */}
+      {showMVPOffer && (
+        <Card className="shadow-lg border-2 border-yellow-400">
+          <CardHeader className="bg-gradient-to-r from-yellow-400 to-orange-400 text-black">
+            <CardTitle className="text-2xl font-bold flex items-center gap-3">
+              <Crown className="h-8 w-8" />
+              Special Offer: Unlock ALL Bonuses Now!
+            </CardTitle>
+          </CardHeader>
+          
+          <CardContent className="p-6">
+            <div className="text-center mb-6">
+              <h2 className="text-3xl font-bold mb-4">{selectedMVP.name}</h2>
+              <p className="text-xl text-gray-600 mb-6">
+                You've earned amazing rewards! Purchase now to unlock ALL bonus features permanently.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <h3 className="font-bold text-green-800 mb-2">Rewards You've Earned:</h3>
+                  <ul className="text-sm text-green-700 space-y-1">
+                    {quizProgress.earnedRewards.map((reward, index) => (
+                      <li key={index} className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4" />
+                        {reward.title}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input 
-                    id="email"
-                    type="email"
-                    placeholder="your@email.com"
-                    value={contactInfo.email}
-                    onChange={(e) => setContactInfo(prev => ({ ...prev, email: e.target.value }))}
-                  />
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <h3 className="font-bold text-purple-800 mb-2">What You Get (5 Features):</h3>
+                  <ul className="text-sm text-purple-700 space-y-1">
+                    {selectedMVP.features.map((feature, index) => (
+                      <li key={index} className="flex items-center gap-2">
+                        <Star className="h-4 w-4" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                
-                <Button 
-                  onClick={() => startQuizMutation.mutate()}
-                  disabled={startQuizMutation.isPending || !contactInfo.name || !contactInfo.email}
-                  className="w-full"
+              </div>
+              
+              {showBonusWarning && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-center gap-3 text-red-800">
+                    <AlertTriangle className="h-6 w-6" />
+                    <div>
+                      <h3 className="font-bold">⚠️ FINAL WARNING!</h3>
+                      <p className="text-sm">This is your LAST CHANCE to get these bonuses. They will expire permanently if you decline.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="flex gap-4">
+              <Button
+                onClick={handleMVPPurchase}
+                className="flex-1 h-12 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold text-lg"
+              >
+                <DollarSign className="mr-2 h-5 w-5" />
+                Yes! Unlock Everything Now
+              </Button>
+              
+              <Button
+                onClick={handleDeclineMVP}
+                variant="outline"
+                className="flex-1 h-12 border-2 border-gray-300 hover:bg-gray-50"
+              >
+                {currentSet === 5 ? "No Thanks (Lose All Bonuses)" : "Continue Quiz (Harder Questions)"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Aura Chat Assistant (final decline) */}
+      {showAuraChat && (
+        <Card className="shadow-lg border-2 border-blue-400">
+          <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+            <CardTitle className="text-xl font-bold flex items-center gap-3">
+              <MessageSquare className="h-6 w-6" />
+              Aura™ AI Assistant - Final Opportunity
+            </CardTitle>
+          </CardHeader>
+          
+          <CardContent className="p-6">
+            <div className="bg-blue-50 rounded-lg p-4 mb-4">
+              <p className="text-blue-800">{auraMessage}</p>
+            </div>
+            
+            <div className="space-y-3">
+              <Textarea
+                placeholder="Ask Aura any questions about the MVP or your concerns..."
+                className="min-h-[100px]"
+              />
+              
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleMVPPurchase}
+                  className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold"
                 >
-                  {startQuizMutation.isPending ? "Starting..." : "Start My Personalized Quiz"}
+                  I'm Ready to Purchase
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    toast({
+                      title: "Thanks for participating!",
+                      description: "You can return anytime, but the bonus offers will no longer be available.",
+                    });
+                  }}
+                  className="border-2 border-gray-300"
+                >
+                  End Session
                 </Button>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+          </CardContent>
+        </Card>
+      )}
 
-  return (
-    <Card className="overflow-hidden">
-      <CardHeader className="border-b border-slate-200">
-        <CardTitle className="text-xl font-semibold text-slate-900">Learn & Earn Loop Builder</CardTitle>
-        <p className="text-sm text-slate-600">Create personalized quiz experiences that convert to sales</p>
-      </CardHeader>
-      
-      <CardContent className="p-6">
-        {/* Quiz Progress */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-semibold text-slate-900">Quiz Progress</h3>
-            <span className="text-sm text-slate-600">Set 1 of 5 | Question 1 of 3</span>
-          </div>
-          <Progress value={progress} className="h-3" />
-        </div>
-        
-        {/* Current Question */}
-        <div className="bg-slate-50 rounded-lg p-6 mb-6">
-          <div className="mb-4">
-            <span className="inline-block bg-primary/10 text-primary text-sm font-medium px-3 py-1 rounded-full mb-3">
-              FlowBoost Pro Question
-            </span>
-            <h4 className="text-xl font-semibold text-slate-900">
-              {question.question}
-            </h4>
-          </div>
-          
-          <RadioGroup value={selectedAnswer} onValueChange={setSelectedAnswer} className="space-y-3">
-            {question.options.map((option) => (
-              <div key={option.id} className="flex items-start space-x-3 p-4 border border-slate-200 rounded-lg hover:bg-white cursor-pointer transition-colors">
-                <RadioGroupItem value={option.id} id={option.id} className="mt-1" />
-                <div className="flex-1">
-                  <Label htmlFor={option.id} className="font-medium text-slate-900 cursor-pointer">
-                    {option.text}
-                  </Label>
-                  <div className="text-sm text-slate-600 mt-1">{option.description}</div>
-                </div>
-              </div>
-            ))}
-          </RadioGroup>
-          
-          <Button 
-            onClick={() => submitAnswerMutation.mutate()}
-            disabled={submitAnswerMutation.isPending || !selectedAnswer}
-            className="mt-6"
-          >
-            {submitAnswerMutation.isPending ? "Submitting..." : "Submit Answer & Get Reward"}
-          </Button>
-        </div>
-        
-        {/* Rewards Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Completed Rewards */}
-          <div className="bg-success/5 border border-success/20 rounded-lg p-4">
-            <div className="flex items-center mb-3">
-              <CheckCircle className="text-success mr-2" size={20} />
-              <h4 className="font-semibold text-success">Completed Rewards</h4>
-            </div>
-            <div className="space-y-2 text-sm">
-              {completedRewards.map((reward, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <span className="text-success">{reward}</span>
-                  <Button 
-                    size="sm" 
-                    variant="ghost"
-                    onClick={() => downloadPDF(reward)}
-                    className="text-success hover:text-success p-1"
-                  >
-                    <Download size={16} />
+      {/* Rewards earned sidebar */}
+      <Card className="bg-gray-50">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Gift className="h-5 w-5 text-purple-600" />
+            Your Earned Rewards
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {quizProgress.earnedRewards.length > 0 ? (
+            <div className="space-y-3">
+              {quizProgress.earnedRewards.map((reward, index) => (
+                <div key={index} className="flex items-center gap-3 p-3 bg-white rounded-lg border">
+                  {reward.type === 'pdf' ? <BookOpen className="h-5 w-5 text-blue-600" /> : <Gift className="h-5 w-5 text-purple-600" />}
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-sm">{reward.title}</h4>
+                    <p className="text-xs text-gray-600">{reward.description}</p>
+                  </div>
+                  <Button size="sm" variant="outline">
+                    <Download className="h-4 w-4" />
                   </Button>
                 </div>
               ))}
-              {completedRewards.length === 0 && (
-                <div className="text-success/60">No rewards yet</div>
-              )}
             </div>
-          </div>
-          
-          {/* Current Reward */}
-          <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-            <div className="flex items-center mb-3">
-              <Gift className="text-primary mr-2" size={20} />
-              <h4 className="font-semibold text-primary">Current Reward</h4>
-            </div>
-            <div className="text-sm text-primary">
-              <div className="font-medium">{question.reward.title}</div>
-              <div>{question.reward.description}</div>
-            </div>
-          </div>
-          
-          {/* Next Bonus */}
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-            <div className="flex items-center mb-3">
-              <Star className="text-amber-600 mr-2" size={20} />
-              <h4 className="font-semibold text-amber-900">Bonus Feature</h4>
-            </div>
-            <div className="text-sm text-amber-700">
-              <div className="font-medium">AI Analytics Dashboard</div>
-              <div>Unlock by purchasing MVP</div>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+          ) : (
+            <p className="text-gray-500 text-center py-4">
+              Complete questions to earn rewards
+            </p>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

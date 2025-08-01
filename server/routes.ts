@@ -87,6 +87,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Learn & Earn Loop API routes (PDR Compliant)
+  app.post("/api/quiz/answer", async (req, res) => {
+    try {
+      const { contactEmail, setNumber, questionNumber, answer, reward } = req.body;
+      
+      // Store the answer in loop_outcomes table (PDR requirement)
+      const outcome = await storage.createLoopOutcome({
+        contactEmail,
+        setNumber,
+        questionNumber,
+        answer,
+        timestamp: new Date().toISOString(),
+        rewardType: reward.type,
+        rewardTitle: reward.title
+      });
+      
+      // Generate PDF or process bonus feature
+      let rewardData = null;
+      if (reward.type === 'pdf') {
+        rewardData = await generatePDFReward(reward.title, contactEmail);
+      } else if (reward.type === 'bonus_feature') {
+        rewardData = await processBonusFeature(reward.featureId, contactEmail);
+      }
+      
+      res.json({ outcome, reward: rewardData });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // PDF Reward generation (PDR requirement)
+  app.get("/api/rewards/pdf/:type", async (req, res) => {
+    try {
+      const { type } = req.params;
+      const { mvpName, contactName } = req.query;
+      
+      const pdfData = await generatePDFReward(type as string, contactName as string, mvpName as string);
+      res.json(pdfData);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Form submissions (PDR Table: form_submissions)
+  app.post("/api/form-submissions", async (req, res) => {
+    try {
+      const submissionData = insertFormSubmissionSchema.parse(req.body);
+      const submission = await storage.createFormSubmission(submissionData);
+      res.json(submission);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
   // Brand routes
   app.post("/api/brands", async (req, res) => {
     try {
@@ -349,6 +403,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
-  return httpServer;
+  const server = createServer(app);
+  return server;
+}
+
+// PDR Helper Functions
+async function generatePDFReward(rewardTitle: string, contactEmail: string, mvpName?: string) {
+  // In production, this would generate actual PDFs using a library like PDFKit or Puppeteer
+  return {
+    title: rewardTitle,
+    filename: `${rewardTitle.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.pdf`,
+    downloadUrl: `/api/download/${rewardTitle.toLowerCase().replace(/\s+/g, '-')}`,
+    content: `Generated PDF: ${rewardTitle} for ${contactEmail}${mvpName ? ` - ${mvpName}` : ''}`,
+    generatedAt: new Date().toISOString()
+  };
+}
+
+async function processBonusFeature(featureId: string, contactEmail: string) {
+  // In production, this would unlock the feature in the user's account
+  return {
+    featureId,
+    unlocked: true,
+    unlockedAt: new Date().toISOString(),
+    contactEmail,
+    description: `Bonus feature ${featureId} unlocked for ${contactEmail}`
+  };
 }
