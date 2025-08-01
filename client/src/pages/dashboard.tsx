@@ -72,11 +72,13 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50">
       <AppHeader />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <ModuleNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+        {hasSubscription && (
+          <ModuleNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+        )}
         
         <div className="mt-8">
           {renderActiveComponent()}
