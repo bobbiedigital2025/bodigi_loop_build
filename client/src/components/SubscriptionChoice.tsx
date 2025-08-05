@@ -224,7 +224,7 @@ export function SubscriptionChoice({ onSubscriptionSelected, currentUserId }: Su
     }
   };
 
-  const getFeatureList = (planId: string, features: any) => {
+  const getFeatureList2 = (planId: string, features: any) => {
     const featureItems = [];
     
     if (planId === 'trial') {
