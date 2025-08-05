@@ -1,0 +1,89 @@
+name: 📋 PDR Enhancement
+description: Request an enhancement to the Product Development Requirements system
+title: "[PDR] "
+labels: ["pdr", "enhancement", "needs-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Requesting a PDR (Product Development Requirements) enhancement 📋
+        
+  - type: dropdown
+    id: pdr-category
+    attributes:
+      label: PDR Category
+      description: Which PDR component needs enhancement?
+      options:
+        - Question Sets (5x3 Structure)
+        - Reward System (PDF/Bonus Features)
+        - MVP Offers
+        - Contact Capture
+        - Aura AI Chat Integration
+        - CRM Tracking
+        - Analytics & Reporting
+        - Other
+    validations:
+      required: true
+      
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: Current PDR Behavior
+      description: Describe how the PDR system currently works in this area
+      placeholder: Currently the system...
+    validations:
+      required: true
+      
+  - type: textarea
+    id: proposed-enhancement
+    attributes:
+      label: Proposed Enhancement
+      description: Describe the specific PDR enhancement you're requesting
+      placeholder: I propose we enhance...
+    validations:
+      required: true
+      
+  - type: textarea
+    id: business-impact
+    attributes:
+      label: Business Impact
+      description: How will this enhancement improve conversion or user experience?
+      placeholder: This will improve...
+    validations:
+      required: true
+      
+  - type: dropdown
+    id: compliance
+    attributes:
+      label: PDR Compliance
+      description: Does this maintain PDR specification compliance?
+      options:
+        - Yes - Fully compliant with PDR specs
+        - Partial - Minor deviation from specs
+        - No - Requires PDR spec update
+    validations:
+      required: true
+      
+  - type: checkboxes
+    id: affected-systems
+    attributes:
+      label: Affected Systems
+      description: Which systems will be impacted by this enhancement?
+      options:
+        - label: Learn & Earn Loop Frontend
+        - label: Quiz API Endpoints
+        - label: Contact Hub CRM
+        - label: Reward Generation System
+        - label: Analytics Dashboard
+        - label: Database Schema
+        - label: Aura AI Integration
+        - label: Payment Processing
+        
+  - type: textarea
+    id: implementation-notes
+    attributes:
+      label: Implementation Notes
+      description: Any technical considerations or implementation details
+      placeholder: Technical considerations...
+    validations:
+      required: false

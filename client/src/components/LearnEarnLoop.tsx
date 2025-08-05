@@ -25,9 +25,7 @@ import {
   DollarSign,
   AlertTriangle,
   MessageSquare,
-  Brain,
-  Rocket,
-  Shield
+  Brain,<FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF></FFFFFFFFFFFFFFF\
 } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";

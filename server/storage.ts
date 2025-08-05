@@ -166,8 +166,13 @@ export class MemStorage implements IStorage {
   async createContact(insertContact: InsertContact): Promise<Contact> {
     const id = randomUUID();
     const contact: Contact = { 
-      ...insertContact, 
       id,
+      name: insertContact.name,
+      email: insertContact.email,
+      ownerId: insertContact.ownerId || null,
+      entryType: insertContact.entryType || 'direct',
+      mvpId: insertContact.mvpId || null,
+      purchaseTier: insertContact.purchaseTier || null,
       status: insertContact.status || 'lead',
       tags: insertContact.tags || [],
       createdAt: new Date() 
@@ -250,11 +255,15 @@ export class MemStorage implements IStorage {
   async createBrand(insertBrand: InsertBrand): Promise<Brand> {
     const id = randomUUID();
     const brand: Brand = { 
-      ...insertBrand, 
       id,
+      name: insertBrand.name,
+      userId: insertBrand.userId,
+      niche: insertBrand.niche,
       keywords: insertBrand.keywords || null,
       personality: insertBrand.personality || [],
+      slogan: insertBrand.slogan || null,
       colorPalette: insertBrand.colorPalette || {},
+      logoUrl: insertBrand.logoUrl || null,
       createdAt: new Date() 
     };
     this.brands.set(id, brand);
@@ -282,12 +291,16 @@ export class MemStorage implements IStorage {
   async createMVP(insertMVP: InsertMVP): Promise<MVP> {
     const id = randomUUID();
     const mvp: MVP = { 
-      ...insertMVP, 
       id,
+      name: insertMVP.name,
+      type: insertMVP.type,
+      userId: insertMVP.userId,
+      brandId: insertMVP.brandId || null,
+      problem: insertMVP.problem,
       features: insertMVP.features || [],
       pricing: insertMVP.pricing || {},
-      totalValue: insertMVP.totalValue || 0,
-      isActive: insertMVP.isActive !== false,
+      totalValue: insertMVP.totalValue || null,
+      isActive: insertMVP.isActive || null,
       createdAt: new Date() 
     };
     this.mvps.set(id, mvp);
@@ -408,8 +421,16 @@ export class MemStorage implements IStorage {
   async createSubscription(insertSubscription: InsertSubscription): Promise<Subscription> {
     const id = randomUUID();
     const subscription: Subscription = { 
-      ...insertSubscription, 
       id,
+      userId: insertSubscription.userId,
+      planId: insertSubscription.planId,
+      status: insertSubscription.status,
+      stripeCustomerId: insertSubscription.stripeCustomerId || null,
+      stripeSubscriptionId: insertSubscription.stripeSubscriptionId || null,
+      currentPeriodStart: insertSubscription.currentPeriodStart,
+      currentPeriodEnd: insertSubscription.currentPeriodEnd,
+      trialEnd: insertSubscription.trialEnd || null,
+      cancelAtPeriodEnd: insertSubscription.cancelAtPeriodEnd || null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -506,9 +527,23 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Use database storage if DATABASE_URL is provided, otherwise fall back to in-memory
+// Use Supabase storage if Supabase is configured, otherwise fall back to database or in-memory
 import { DatabaseStorage } from "./storage-db";
+import { SupabaseStorage } from "./storage-supabase";
 
-export const storage = process.env.DATABASE_URL 
-  ? new DatabaseStorage() 
-  : new MemStorage();
+export const storage = (() => {
+  // Check if Supabase is configured
+  const hasSupabase = process.env.VITE_SUPABASE_URL && 
+    (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY);
+  
+  if (hasSupabase) {
+    console.log('🚀 Using Supabase storage with AI capabilities');
+    return new SupabaseStorage();
+  } else if (process.env.DATABASE_URL) {
+    console.log('📊 Using database storage');
+    return new DatabaseStorage();
+  } else {
+    console.log('💾 Using in-memory storage (development mode)');
+    return new MemStorage();
+  }
+})();
