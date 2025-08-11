@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Rocket, 
   Sparkles, 
@@ -22,11 +23,13 @@ import {
   BookOpen,
   ShoppingCart,
   Calculator,
-  Palette
+  Palette,
+  Wand2
 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import AutomatedMVPBuilder from "./AutomatedMVPBuilder";
 
 const mvpTypes = {
   app: {
@@ -105,7 +108,7 @@ const bonusFeatures = [
   }
 ];
 
-export default function MVPBuilder() {
+export default function MVPBuilder(): JSX.Element {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -633,6 +636,62 @@ export default function MVPBuilder() {
           Save MVP & Continue to Marketing
         </Button>
       </div>
+    </div>
+  );
+
+  return (
+    <div className="max-w-6xl mx-auto p-6">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-slate-900 mb-4">MVP Builder</h1>
+        <p className="text-xl text-slate-600">Choose how you want to build your Minimum Viable Product</p>
+      </div>
+
+      <Tabs defaultValue="automated" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-8">
+          <TabsTrigger value="automated" className="flex items-center gap-2">
+            <Wand2 className="h-4 w-4" />
+            AI-Powered Builder
+          </TabsTrigger>
+          <TabsTrigger value="manual" className="flex items-center gap-2">
+            <Rocket className="h-4 w-4" />
+            Manual Builder
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="automated">
+          <AutomatedMVPBuilder />
+        </TabsContent>
+        
+        <TabsContent value="manual">
+          <div className="space-y-8">
+            {/* Progress Steps */}
+            <div className="flex items-center justify-center mb-8">
+              <div className="flex items-center space-x-4">
+                {[1, 2, 3].map((stepNum) => (
+                  <div key={stepNum} className="flex items-center">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 font-semibold ${
+                      step >= stepNum 
+                        ? 'bg-blue-600 border-blue-600 text-white' 
+                        : 'border-gray-300 text-gray-400'
+                    }`}>
+                      {stepNum}
+                    </div>
+                    {stepNum < 3 && (
+                      <div className={`w-16 h-1 mx-2 ${
+                        step > stepNum ? 'bg-blue-600' : 'bg-gray-300'
+                      }`} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {step === 1 && renderStep1()}
+            {step === 2 && renderStep2()}
+            {step === 3 && renderStep3()}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

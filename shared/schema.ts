@@ -50,6 +50,15 @@ export const mvps = pgTable("mvps", {
   pricing: jsonb("pricing").default({}),
   totalValue: integer("total_value").default(0),
   isActive: boolean("is_active").default(true),
+  // New fields for automated MVP details
+  howItWorks: text("how_it_works"),
+  setupInstructions: text("setup_instructions"),
+  revenueProjection: jsonb("revenue_projection").default({}),
+  investorTypes: jsonb("investor_types").default([]),
+  investorPlatforms: jsonb("investor_platforms").default([]),
+  promotionChannels: jsonb("promotion_channels").default([]),
+  salesPlatforms: jsonb("sales_platforms").default([]),
+  isAiGenerated: boolean("is_ai_generated").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -114,7 +123,28 @@ export const subscriptions = pgTable("subscriptions", {
   updatedAt: timestamp("updated_at").defaultNow().notNull()
 });
 
-// New table to track build usage
+export const mvpSuggestions = pgTable("mvp_suggestions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  brandId: varchar("brand_id").references(() => brands.id).notNull(),
+  sessionId: varchar("session_id").notNull(), // To group suggestions from same generation
+  name: text("name").notNull(),
+  type: text("type").notNull(),
+  description: text("description").notNull(),
+  problem: text("problem").notNull(),
+  features: jsonb("features").default([]),
+  pricing: jsonb("pricing").default({}),
+  howItWorks: text("how_it_works").notNull(),
+  setupInstructions: text("setup_instructions").notNull(),
+  revenueProjection: jsonb("revenue_projection").default({}),
+  investorTypes: jsonb("investor_types").default([]),
+  investorPlatforms: jsonb("investor_platforms").default([]),
+  promotionChannels: jsonb("promotion_channels").default([]),
+  salesPlatforms: jsonb("sales_platforms").default([]),
+  isSelected: boolean("is_selected").default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const buildUsage = pgTable("build_usage", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id).notNull(),
@@ -179,6 +209,11 @@ export const insertSubscriptionSchema = createInsertSchema(subscriptions).omit({
   updatedAt: true,
 });
 
+export const insertMVPSuggestionSchema = createInsertSchema(mvpSuggestions).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertBuildUsageSchema = createInsertSchema(buildUsage).omit({
   id: true,
   createdAt: true,
@@ -198,6 +233,8 @@ export type Brand = typeof brands.$inferSelect;
 export type InsertBrand = z.infer<typeof insertBrandSchema>;
 export type MVP = typeof mvps.$inferSelect;
 export type InsertMVP = z.infer<typeof insertMVPSchema>;
+export type MVPSuggestion = typeof mvpSuggestions.$inferSelect;
+export type InsertMVPSuggestion = z.infer<typeof insertMVPSuggestionSchema>;
 export type QuizTemplate = typeof quizTemplates.$inferSelect;
 export type InsertQuizTemplate = z.infer<typeof insertQuizTemplateSchema>;
 export type QuizSession = typeof quizSessions.$inferSelect;
