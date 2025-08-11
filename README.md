@@ -66,14 +66,68 @@ Final set = bonus loss warning + Aura chat assistant.
 
 ---
 
-## .env Needed
+## Environment Variables
+
+You will need to create a `.env` file in the root of the project. This file will store your secret keys and other environment-specific configurations.
 
 ```bash
-SUPABASE_URL=
-SUPABASE_ANON_KEY=
-DATABASE_URL=
+# Supabase
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+DATABASE_URL=your_supabase_postgres_connection_string
+
+# Stripe
+STRIPE_SECRET_KEY=your_stripe_secret_key
+VITE_STRIPE_PUBLIC_KEY=your_stripe_publishable_key
 ```
+
+### Where to get the environment variables:
+
+-   **Supabase**:
+    1.  Go to your [Supabase Dashboard](https://app.supabase.io).
+    2.  Create a new project or go to your existing project's settings.
+    3.  **`SUPABASE_URL`** and **`SUPABASE_ANON_KEY`**: Find these in `Project Settings` > `API`.
+    4.  **`SUPABASE_SERVICE_ROLE_KEY`**: Also in `Project Settings` > `API`. Keep this key secret.
+    5.  **`DATABASE_URL`**: Find this in `Project Settings` > `Database`. Use the URI string for `psql`.
+
+-   **Stripe**:
+    1.  Go to your [Stripe Dashboard](https://dashboard.stripe.com/).
+    2.  **`STRIPE_SECRET_KEY`**: Find this in `Developers` > `API keys`. Use the "Secret key".
+    3.  **`VITE_STRIPE_PUBLIC_KEY`**: Also in `Developers` > `API keys`. Use the "Publishable key".
+
+## Installation and Setup
+
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository_url>
+    cd <repository_name>
+    ```
+
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+
+3.  **Set up environment variables:**
+    Create a `.env` file in the root directory and add the variables as described in the "Environment Variables" section.
+
+4.  **Run database migrations:**
+    Apply the database schema to your Supabase instance.
+    ```bash
+    npm run db:push
+    ```
+    Alternatively, you can run the SQL from `supabase-migration.sql` directly in the Supabase SQL editor.
+
+## Available Scripts
+
+-   **`npm run dev`**: Starts the development server for both the client and the server.
+-   **`npm run build`**: Builds the frontend and backend for production.
+-   **`npm run start`**: Starts the production server. Make sure you have run `npm run build` first.
+-   **`npm run check`**: Runs the TypeScript compiler to check for type errors.
+-   **`npm run db:push`**: Pushes your Drizzle schema changes to the database.
 
 ---
 
 © 2025 Bobbie Digital · All rights reserved · License v1.0
+
