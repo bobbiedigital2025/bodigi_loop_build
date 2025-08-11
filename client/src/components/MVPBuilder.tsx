@@ -108,7 +108,7 @@ const bonusFeatures = [
   }
 ];
 
-export default function MVPBuilder() {
+export default function MVPBuilder(): JSX.Element {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({

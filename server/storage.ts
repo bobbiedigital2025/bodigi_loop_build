@@ -309,6 +309,14 @@ export class MemStorage implements IStorage {
       pricing: insertMVP.pricing || {},
       totalValue: insertMVP.totalValue || null,
       isActive: insertMVP.isActive || null,
+      howItWorks: insertMVP.howItWorks || null,
+      setupInstructions: insertMVP.setupInstructions || null,
+      revenueProjection: insertMVP.revenueProjection || {},
+      investorTypes: insertMVP.investorTypes || [],
+      investorPlatforms: insertMVP.investorPlatforms || [],
+      promotionChannels: insertMVP.promotionChannels || [],
+      salesPlatforms: insertMVP.salesPlatforms || [],
+      isAiGenerated: insertMVP.isAiGenerated || false,
       createdAt: new Date() 
     };
     this.mvps.set(id, mvp);
