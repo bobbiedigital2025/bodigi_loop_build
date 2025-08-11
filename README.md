@@ -71,9 +71,7 @@ Final set = bonus loss warning + Aura chat assistant.
 ```bash
 SUPABASE_URL=
 SUPABASE_ANON_KEY=
-MCP_API_KEY=
-LOOP_INTELLIGENCE_SECRET=
-REPLIT_PROJECT_ID=
+DATABASE_URL=
 ```
 
 ---
