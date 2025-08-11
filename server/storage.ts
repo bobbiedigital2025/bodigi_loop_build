@@ -3,6 +3,7 @@ import {
   type Contact, type InsertContact,
   type Brand, type InsertBrand,
   type MVP, type InsertMVP,
+  type MVPSuggestion, type InsertMVPSuggestion,
   type QuizTemplate, type InsertQuizTemplate,
   type QuizSession, type InsertQuizSession,
   type MarketingContent, type InsertMarketingContent,
@@ -54,6 +55,12 @@ export interface IStorage {
   createMVP(mvp: InsertMVP): Promise<MVP>;
   updateMVP(id: string, updates: Partial<InsertMVP>): Promise<MVP>;
 
+  // MVP Suggestions
+  getMVPSuggestion(id: string): Promise<MVPSuggestion | undefined>;
+  getMVPSuggestionsBySession(sessionId: string): Promise<MVPSuggestion[]>;
+  createMVPSuggestion(suggestion: InsertMVPSuggestion): Promise<MVPSuggestion>;
+  updateMVPSuggestion(id: string, updates: Partial<MVPSuggestion>): Promise<MVPSuggestion>;
+
   // Quiz Templates
   getQuizTemplate(id: string): Promise<QuizTemplate | undefined>;
   getQuizTemplatesByMVP(mvpId: string): Promise<QuizTemplate[]>;
@@ -103,6 +110,7 @@ export class MemStorage implements IStorage {
   private contacts: Map<string, Contact> = new Map();
   private brands: Map<string, Brand> = new Map();
   private mvps: Map<string, MVP> = new Map();
+  private mvpSuggestions: Map<string, MVPSuggestion> = new Map();
   private quizTemplates: Map<string, QuizTemplate> = new Map();
   private quizSessions: Map<string, QuizSession> = new Map();
   private marketingContent: Map<string, MarketingContent> = new Map();
@@ -314,6 +322,51 @@ export class MemStorage implements IStorage {
     const updatedMVP = { ...mvp, ...updates };
     this.mvps.set(id, updatedMVP);
     return updatedMVP;
+  }
+
+  // MVP Suggestions
+  async getMVPSuggestion(id: string): Promise<MVPSuggestion | undefined> {
+    return this.mvpSuggestions.get(id);
+  }
+
+  async getMVPSuggestionsBySession(sessionId: string): Promise<MVPSuggestion[]> {
+    return Array.from(this.mvpSuggestions.values()).filter(suggestion => suggestion.sessionId === sessionId);
+  }
+
+  async createMVPSuggestion(insertSuggestion: InsertMVPSuggestion): Promise<MVPSuggestion> {
+    const id = randomUUID();
+    const suggestion: MVPSuggestion = { 
+      id,
+      userId: insertSuggestion.userId,
+      brandId: insertSuggestion.brandId,
+      sessionId: insertSuggestion.sessionId,
+      name: insertSuggestion.name,
+      type: insertSuggestion.type,
+      description: insertSuggestion.description,
+      problem: insertSuggestion.problem,
+      features: insertSuggestion.features || [],
+      pricing: insertSuggestion.pricing || {},
+      howItWorks: insertSuggestion.howItWorks,
+      setupInstructions: insertSuggestion.setupInstructions,
+      revenueProjection: insertSuggestion.revenueProjection || {},
+      investorTypes: insertSuggestion.investorTypes || [],
+      investorPlatforms: insertSuggestion.investorPlatforms || [],
+      promotionChannels: insertSuggestion.promotionChannels || [],
+      salesPlatforms: insertSuggestion.salesPlatforms || [],
+      isSelected: insertSuggestion.isSelected || false,
+      createdAt: new Date() 
+    };
+    this.mvpSuggestions.set(id, suggestion);
+    return suggestion;
+  }
+
+  async updateMVPSuggestion(id: string, updates: Partial<MVPSuggestion>): Promise<MVPSuggestion> {
+    const suggestion = this.mvpSuggestions.get(id);
+    if (!suggestion) throw new Error("MVP suggestion not found");
+    
+    const updatedSuggestion = { ...suggestion, ...updates };
+    this.mvpSuggestions.set(id, updatedSuggestion);
+    return updatedSuggestion;
   }
 
   // Quiz Templates
