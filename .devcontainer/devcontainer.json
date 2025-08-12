@@ -1,0 +1,66 @@
+{
+  "name": "Bodigi Loop Build",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-20-bullseye",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "nodeGypDependencies": true,
+      "version": "20"
+    }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next",
+        "ms-vscode.vscode-json",
+        "ms-vscode.vscode-eslint",
+        "formulahendry.auto-rename-tag",
+        "christian-kohler.path-intellisense",
+        "ms-vscode.vscode-thunder-client",
+        "ms-vscode.vscode-react-native",
+        "ms-vscode.vscode-node-debug2",
+        "streetsidesoftware.code-spell-checker",
+        "usernamehw.errorlens",
+        "ms-vscode.vscode-color-theme-tomorrow"
+      ],
+      "settings": {
+        "typescript.preferences.importModuleSpecifier": "relative",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "tailwindCSS.includeLanguages": {
+          "typescript": "typescript",
+          "typescriptreact": "typescriptreact"
+        },
+        "files.associations": {
+          "*.css": "tailwindcss"
+        }
+      }
+    }
+  },
+
+  "forwardPorts": [5000, 5173],
+  "portsAttributes": {
+    "5000": {
+      "label": "Express Backend",
+      "onAutoForward": "notify"
+    },
+    "5173": {
+      "label": "Vite Frontend",
+      "onAutoForward": "openPreview"
+    }
+  },
+
+  "postCreateCommand": "./.devcontainer/setup.sh",
+  "postStartCommand": "echo 'Codespace is ready! Run npm run dev to start the application.'",
+
+  "remoteUser": "node",
+  "containerEnv": {
+    "NODE_ENV": "development"
+  }
+}
