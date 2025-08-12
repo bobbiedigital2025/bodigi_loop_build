@@ -1,5 +1,7 @@
 # Bodigi Loop Build
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/bobbiedigital2025/bodigi_loop_build)
+
 This project is a full-stack application using the following technologies:
 
 - **Frontend**: React with Vite
@@ -7,6 +9,28 @@ This project is a full-stack application using the following technologies:
 - **Database**: Supabase (Postgres)
 - **ORM**: Drizzle ORM
 - **Payments**: Stripe
+
+## 🚀 Getting Started with GitHub Codespaces
+
+This project is configured for GitHub Codespaces! Click the "Code" button on GitHub and select "Create codespace on main" to get started instantly.
+
+### What happens when you open in Codespaces:
+1. **Automatic Setup**: Dependencies are installed automatically
+2. **Environment Configuration**: Development environment is pre-configured
+3. **Port Forwarding**: Frontend (5173) and backend (5000) ports are automatically forwarded
+4. **VS Code Extensions**: All necessary extensions are pre-installed
+
+### Quick Start in Codespaces:
+```bash
+# Start both frontend and backend
+npm run dev
+
+# Or start them separately:
+npm run dev:client  # Frontend only (Vite)
+npm run dev:server  # Backend only (Express)
+```
+
+The frontend will be available at the forwarded port 5173, and the backend API at port 5000.
 
 ## Prerequisites
 
