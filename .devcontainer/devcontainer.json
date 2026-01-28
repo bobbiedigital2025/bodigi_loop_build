@@ -6,6 +6,12 @@
     "ghcr.io/devcontainers/features/node:1": {
       "nodeGypDependencies": true,
       "version": "20"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "latest"
     }
   },
 
@@ -24,7 +30,9 @@
         "ms-vscode.vscode-node-debug2",
         "streetsidesoftware.code-spell-checker",
         "usernamehw.errorlens",
-        "ms-vscode.vscode-color-theme-tomorrow"
+        "ms-vscode.vscode-color-theme-tomorrow",
+        "github.copilot",
+        "github.copilot-chat"
       ],
       "settings": {
         "typescript.preferences.importModuleSpecifier": "relative",
@@ -39,8 +47,17 @@
         },
         "files.associations": {
           "*.css": "tailwindcss"
+        },
+        "github.copilot.enable": {
+          "*": true
         }
       }
+    },
+    "codespaces": {
+      "openFiles": [
+        "README.md",
+        "CODESPACE_GUIDE.md"
+      ]
     }
   },
 
@@ -62,5 +79,9 @@
   "remoteUser": "node",
   "containerEnv": {
     "NODE_ENV": "development"
-  }
+  },
+
+  "mounts": [
+    "source=${localEnv:HOME}/.config/github-copilot,target=/home/node/.config/github-copilot,type=bind,consistency=cached"
+  ]
 }

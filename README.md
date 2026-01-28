@@ -17,8 +17,9 @@ This project is configured for GitHub Codespaces! Click the "Code" button on Git
 ### What happens when you open in Codespaces:
 1. **Automatic Setup**: Dependencies are installed automatically
 2. **Environment Configuration**: Development environment is pre-configured
-3. **Port Forwarding**: Frontend (5173) and backend (5000) ports are automatically forwarded
-4. **VS Code Extensions**: All necessary extensions are pre-installed
+3. **AI-Powered Development**: GitHub Copilot and MCP server integration enabled
+4. **Port Forwarding**: Frontend (5173) and backend (5000) ports are automatically forwarded
+5. **VS Code Extensions**: All necessary extensions are pre-installed
 
 ### Quick Start in Codespaces:
 ```bash

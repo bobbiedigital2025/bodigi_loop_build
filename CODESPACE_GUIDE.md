@@ -7,8 +7,12 @@ Welcome to the Bodigi Loop Build project in GitHub Codespaces! 🚀
 ✅ **Node.js 20** environment  
 ✅ **Dependencies** automatically installed  
 ✅ **VS Code extensions** for React, TypeScript, and Tailwind CSS  
+✅ **GitHub Copilot** integration for AI-powered development  
+✅ **MCP Server** configured for enhanced AI assistance  
 ✅ **Port forwarding** for frontend (5173) and backend (5000)  
 ✅ **Environment variables** template (.env created from .env.example)  
+✅ **Docker-in-Docker** for containerization support  
+✅ **GitHub CLI** for repository management  
 
 ## Getting Started
 
@@ -65,9 +69,22 @@ The `.env` file has been created from `.env.example`. You'll need to add your ac
 
 ## VS Code Features
 
+- **GitHub Copilot**: AI-powered code completion and chat assistance
+- **MCP Server**: Enhanced AI context for repository operations
 - **Tasks**: Use `Ctrl/Cmd + Shift + P` → "Tasks: Run Task" to run predefined tasks
 - **Debug**: Launch configurations are available for both frontend and backend
 - **Extensions**: Pre-installed extensions for the best development experience
+
+## AI-Powered Development
+
+This Codespace includes GitHub's MCP (Model Context Protocol) server for enhanced AI assistance:
+
+- **Intelligent code suggestions** with full repository context
+- **Automated workflow management** through GitHub CLI
+- **Smart debugging** with AI-powered insights
+- **Seamless GitHub integration** for issues, PRs, and more
+
+The MCP server is configured in `.vscode/mcp.json` and integrates with GitHub Copilot for the best AI-assisted development experience.
 
 ## Need Help?
 

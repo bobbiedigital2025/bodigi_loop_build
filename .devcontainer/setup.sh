@@ -20,6 +20,10 @@ fi
 
 echo "✨ Bodigi Loop Build setup complete!"
 echo ""
+echo "🤖 GitHub MCP Server is configured for AI-powered development"
+echo "   - GitHub Copilot integration enabled"
+echo "   - MCP server ready for AI assistance"
+echo ""
 echo "🌐 Available commands:"
 echo "  npm run dev          - Start both frontend and backend"
 echo "  npm run dev:client   - Start frontend only (Vite on port 5173)"
