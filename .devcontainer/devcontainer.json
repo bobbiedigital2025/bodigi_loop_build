@@ -79,9 +79,5 @@
   "remoteUser": "node",
   "containerEnv": {
     "NODE_ENV": "development"
-  },
-
-  "mounts": [
-    "source=${localEnv:HOME}/.config/github-copilot,target=/home/node/.config/github-copilot,type=bind,consistency=cached"
-  ]
+  }
 }

@@ -28,14 +28,24 @@ The `.devcontainer/devcontainer.json` includes:
       "extensions": [
         "github.copilot",
         "github.copilot-chat"
+      ],
+      "settings": {
+        "github.copilot.enable": {
+          "*": true
+        }
+      }
+    },
+    "codespaces": {
+      "openFiles": [
+        "README.md",
+        "CODESPACE_GUIDE.md"
       ]
     }
-  },
-  "mounts": [
-    "source=${localEnv:HOME}/.config/github-copilot,target=/home/node/.config/github-copilot,type=bind,consistency=cached"
-  ]
+  }
 }
 ```
+
+**Note**: In GitHub Codespaces, GitHub Copilot settings are automatically synchronized with your account. For local devcontainer usage, you may want to add a mount for persistent settings.
 
 ### MCP Server Configuration
 
@@ -83,8 +93,8 @@ When you open this project in GitHub Codespaces:
 
 1. **Automatic Setup**: MCP server is automatically configured
 2. **GitHub Authentication**: Uses your Codespace's built-in GitHub token
-3. **Copilot Integration**: GitHub Copilot is enabled by default
-4. **Persistent Settings**: Your Copilot preferences are preserved
+3. **Copilot Integration**: GitHub Copilot is enabled by default with automatic settings sync
+4. **No Manual Configuration**: Everything works out of the box
 
 ## Benefits for Development
 
